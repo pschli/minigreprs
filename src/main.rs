@@ -1,6 +1,5 @@
+use minigrep::Config;
 use std::env;
-use std::error::Error;
-use std::fs;
 use std::process;
 
 fn main() {
@@ -14,30 +13,8 @@ fn main() {
     println!("Searching for {}", config.query);
     println!("In file {}", config.file_path);
 
-    if let Err(e) = run(config) {
+    if let Err(e) = minigrep::run(config) {
         println!("Application error: {}", e);
         process::exit(1)
-    }
-}
-
-fn run(config: Config) -> Result<(), Box<dyn Error>> {
-    let contents = fs::read_to_string(config.file_path)?;
-
-    println!("With text:\n\n{contents}");
-    Ok(())
-}
-
-struct Config {
-    query: String,
-    file_path: String,
-}
-impl Config {
-    fn build(args: &[String]) -> Result<Config, &'static str> {
-        if args.len() < 3 {
-            return Err("minigrep needs two arguments: <search text> <path/to/file.txt>");
-        }
-        let query = args[1].clone();
-        let file_path = args[2].clone();
-        return Ok(Config { query, file_path });
     }
 }
