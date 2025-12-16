@@ -9,19 +9,8 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
         search(&config.query, &contents)
     };
 
-    if result.is_empty() {
-        println!(
-            "No lines with \"{}\" in file {}: \n",
-            config.query, config.file_path
-        )
-    } else {
-        println!(
-            "Lines with \"{}\" in file {}: \n",
-            config.query, config.file_path
-        );
-        for line in result {
-            println!("{line}");
-        }
+    for line in result {
+        println!("{line}");
     }
 
     Ok(())
