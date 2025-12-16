@@ -1,9 +1,25 @@
 use std::{error::Error, fs};
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
-    let contents = fs::read_to_string(config.file_path)?;
+    let contents = fs::read_to_string(&config.file_path)?;
 
-    println!("With text:\n\n{contents}");
+    let result = search(&config.query, &contents);
+
+    if result.is_empty() {
+        println!(
+            "No lines with \"{}\" in file {}: \n",
+            config.query, config.file_path
+        )
+    } else {
+        println!(
+            "Lines with \"{}\" in file {}: \n",
+            config.query, config.file_path
+        );
+        for line in result {
+            println!("{line}");
+        }
+    }
+
     Ok(())
 }
 
@@ -19,5 +35,34 @@ impl Config {
         let query = args[1].clone();
         let file_path = args[2].clone();
         return Ok(Config { query, file_path });
+    }
+}
+
+// With the lifetime 'a  for contents we indicate that the returned vector
+// should contain string slices that reference slices of the argument contents
+// (rather than the argument query).
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let mut results = Vec::new();
+    for line in contents.lines() {
+        if line.contains(query) {
+            results.push(line);
+        }
+    }
+    results
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn one_result() {
+        let query = "duct";
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.";
+
+        assert_eq!(vec!["safe, fast, productive."], search(query, contents));
     }
 }
