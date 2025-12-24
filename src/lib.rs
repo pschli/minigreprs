@@ -57,8 +57,8 @@ pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
 }
 
 pub fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
-    let query = query.to_lowercase();
-    let query = query.as_str();
+    let query = &(query.to_lowercase()[..]);
+    // &str => conversion to String by to_lowercase() => turned into &str by &(foo[..]) taking a string slice of the whole String
     contents
         .lines()
         .filter(|line| line.to_lowercase().contains(query))
